@@ -1,0 +1,7374 @@
+[
+    {
+        "id": "dcd0afc64dfc7e30",
+        "type": "tab",
+        "label": "数据库服务",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "3be9767593524592",
+        "type": "tab",
+        "label": "查询接口",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "78e9b6ba2fdbe76d",
+        "type": "tab",
+        "label": "反写接口",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "1ee53fab9037a87f",
+        "type": "subflow",
+        "name": "TDengine",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 440,
+                "y": 200,
+                "wires": [
+                    {
+                        "id": "2edcb1a21d2c50f3"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 900,
+                "y": 260,
+                "wires": [
+                    {
+                        "id": "e5e6cf82da3574e0",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [
+            {
+                "name": "url",
+                "type": "str",
+                "value": "",
+                "ui": {
+                    "icon": "font-awesome/fa-server",
+                    "label": {
+                        "en-US": "FQDN"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "username",
+                "type": "str",
+                "value": "",
+                "ui": {
+                    "icon": "font-awesome/fa-user",
+                    "label": {
+                        "en-US": "用户名"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "password",
+                "type": "str",
+                "value": "",
+                "ui": {
+                    "icon": "font-awesome/fa-lock",
+                    "label": {
+                        "en-US": "密码"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "payload",
+                "type": "str",
+                "value": "",
+                "ui": {
+                    "icon": "font-awesome/fa-send",
+                    "label": {
+                        "en-US": "sql请求"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str"
+                        ]
+                    }
+                }
+            }
+        ],
+        "meta": {},
+        "color": "#C0DEED",
+        "icon": "node-red/db.svg",
+        "status": {
+            "x": 900,
+            "y": 180,
+            "wires": [
+                {
+                    "id": "803d91e33298d261",
+                    "port": 0
+                }
+            ]
+        }
+    },
+    {
+        "id": "48f5b0e59df8c23b",
+        "type": "subflow",
+        "name": "反控输入",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 100,
+                "y": 160,
+                "wires": [
+                    {
+                        "id": "5fe2c1fff788b8ae"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 1020,
+                "y": 160,
+                "wires": [
+                    {
+                        "id": "9c1d63e2cac70581",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
+        "id": "ba572fbd6d0dd168",
+        "type": "OpcUa-Endpoint",
+        "endpoint": "opc.tcp:1.1.1.1:4840",
+        "secpol": "Basic256Sha256",
+        "secmode": "SignAndEncrypt",
+        "none": false,
+        "login": true,
+        "usercert": false,
+        "usercertificate": "",
+        "userprivatekey": ""
+    },
+    {
+        "id": "e5e6cf82da3574e0",
+        "type": "http request",
+        "z": "1ee53fab9037a87f",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "body",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 760,
+        "y": 260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2edcb1a21d2c50f3",
+        "type": "function",
+        "z": "1ee53fab9037a87f",
+        "name": "",
+        "func": "function getBasicToken() {\n    var auth = `${env.get('username')}:${env.get('password')}`;\n    return `Basic ${Buffer.from(auth, 'ascii').toString('base64')}`;\n}\n\nmsg.url = `http://${env.get('url')}/rest/sql`;\n\nmsg.headers = {\n    Authorization: getBasicToken()\n}\n\nif(env.get('payload') !== \"\") {\n    msg.payload = env.get('payload');\n} else {\n    msg.payload = msg.payload;\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 260,
+        "wires": [
+            [
+                "e5e6cf82da3574e0"
+            ]
+        ]
+    },
+    {
+        "id": "803d91e33298d261",
+        "type": "status",
+        "z": "1ee53fab9037a87f",
+        "name": "",
+        "scope": [
+            "e5e6cf82da3574e0"
+        ],
+        "x": 730,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5fe2c1fff788b8ae",
+        "type": "switch",
+        "z": "48f5b0e59df8c23b",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "value",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 290,
+        "y": 160,
+        "wires": [
+            [
+                "8dd5cf4108c18967"
+            ],
+            [
+                "63a948c20d6aabdc"
+            ]
+        ]
+    },
+    {
+        "id": "63a948c20d6aabdc",
+        "type": "change",
+        "z": "48f5b0e59df8c23b",
+        "name": "提示输入value",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "请输入value",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 300,
+        "y": 220,
+        "wires": [
+            [
+                "8c6b9f31478a7f24"
+            ]
+        ]
+    },
+    {
+        "id": "8c6b9f31478a7f24",
+        "type": "http response",
+        "z": "48f5b0e59df8c23b",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 310,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "c05164e37761039b",
+        "type": "switch",
+        "z": "48f5b0e59df8c23b",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "istype",
+                "v": "number",
+                "vt": "number"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 650,
+        "y": 160,
+        "wires": [
+            [
+                "9c1d63e2cac70581"
+            ],
+            [
+                "262027d82acdba48"
+            ]
+        ]
+    },
+    {
+        "id": "262027d82acdba48",
+        "type": "change",
+        "z": "48f5b0e59df8c23b",
+        "name": "提示value值为整数",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "请输入整数值",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 610,
+        "y": 220,
+        "wires": [
+            [
+                "86f7a9199fe196ae"
+            ]
+        ]
+    },
+    {
+        "id": "86f7a9199fe196ae",
+        "type": "http response",
+        "z": "48f5b0e59df8c23b",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 650,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "9c1d63e2cac70581",
+        "type": "switch",
+        "z": "48f5b0e59df8c23b",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 810,
+        "y": 160,
+        "wires": [
+            [],
+            [
+                "5c44eeb65d15a8ed"
+            ]
+        ]
+    },
+    {
+        "id": "5c44eeb65d15a8ed",
+        "type": "change",
+        "z": "48f5b0e59df8c23b",
+        "name": "提示value值为正数",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "请输入整数值",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 830,
+        "y": 220,
+        "wires": [
+            [
+                "1cb2194142278493"
+            ]
+        ]
+    },
+    {
+        "id": "1cb2194142278493",
+        "type": "http response",
+        "z": "48f5b0e59df8c23b",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 830,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "8dd5cf4108c18967",
+        "type": "function",
+        "z": "48f5b0e59df8c23b",
+        "name": "转换输入类型",
+        "func": "msg.payload = Number(msg.payload.value);\nif(isNaN(msg.payload)){\n    msg.payload = \"\";\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 480,
+        "y": 160,
+        "wires": [
+            [
+                "c05164e37761039b"
+            ]
+        ]
+    },
+    {
+        "id": "1f6b477a8a8457a2",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "创建数据库",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 40,
+        "wires": [
+            [
+                "504f9d84d7de3083"
+            ]
+        ]
+    },
+    {
+        "id": "504f9d84d7de3083",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "创建数据库",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "CREATE DATABASE test3;",
+        "output": "str",
+        "x": 270,
+        "y": 40,
+        "wires": [
+            [
+                "61ef7542a075171c"
+            ]
+        ]
+    },
+    {
+        "id": "61ef7542a075171c",
+        "type": "subflow:1ee53fab9037a87f",
+        "z": "dcd0afc64dfc7e30",
+        "name": "",
+        "env": [
+            {
+                "name": "url",
+                "value": "192.168.11.201:6041",
+                "type": "str"
+            },
+            {
+                "name": "username",
+                "value": "root",
+                "type": "str"
+            },
+            {
+                "name": "password",
+                "value": "taosdata",
+                "type": "str"
+            }
+        ],
+        "x": 1240,
+        "y": 120,
+        "wires": [
+            [
+                "897a8c94a0045e16"
+            ]
+        ]
+    },
+    {
+        "id": "897a8c94a0045e16",
+        "type": "debug",
+        "z": "dcd0afc64dfc7e30",
+        "name": "数据库查看",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1390,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "17f47f85829470dc",
+        "type": "tcp in",
+        "z": "dcd0afc64dfc7e30",
+        "name": "",
+        "server": "client",
+        "host": "192.168.11.201",
+        "port": "6041",
+        "datamode": "stream",
+        "datatype": "buffer",
+        "newline": "",
+        "topic": "",
+        "trim": false,
+        "base64": false,
+        "tls": "",
+        "x": 1050,
+        "y": 40,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9034d3eedfcc646e",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "选择数据库",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 80,
+        "wires": [
+            [
+                "510bf39e2d93414e"
+            ]
+        ]
+    },
+    {
+        "id": "510bf39e2d93414e",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "选择ct03",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "use ct03;",
+        "output": "str",
+        "x": 260,
+        "y": 80,
+        "wires": [
+            [
+                "61ef7542a075171c"
+            ]
+        ]
+    },
+    {
+        "id": "5b9fa5030a41ca97",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "创建表",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 160,
+        "wires": [
+            [
+                "f043d0a1a98e5fd6"
+            ]
+        ]
+    },
+    {
+        "id": "f9bb7e0dca4a9707",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "删除表",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 200,
+        "wires": [
+            [
+                "053b99fb286c0d22"
+            ]
+        ]
+    },
+    {
+        "id": "f043d0a1a98e5fd6",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "创建浮点型母表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "CREATE TABLE ct03.float_data(ts timestamp, v float) tags(id nchar(64));",
+        "output": "str",
+        "x": 280,
+        "y": 160,
+        "wires": [
+            [
+                "61ef7542a075171c"
+            ]
+        ]
+    },
+    {
+        "id": "053b99fb286c0d22",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "删除浮点型母表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "DROP TABLE ct03.float_data;",
+        "output": "str",
+        "x": 280,
+        "y": 200,
+        "wires": [
+            [
+                "61ef7542a075171c"
+            ]
+        ]
+    },
+    {
+        "id": "cc9dc768e5a1ef13",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "创建表",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 260,
+        "wires": [
+            [
+                "ca3e0a6fdf511b55"
+            ]
+        ]
+    },
+    {
+        "id": "3de6c1e701601966",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "删除表",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 300,
+        "wires": [
+            [
+                "2c8a4fc78b39a68d"
+            ]
+        ]
+    },
+    {
+        "id": "ca3e0a6fdf511b55",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "创建布尔型母表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "CREATE TABLE ct03.bool_data(ts timestamp, b bool) tags(id nchar(64));",
+        "output": "str",
+        "x": 280,
+        "y": 260,
+        "wires": [
+            [
+                "61ef7542a075171c"
+            ]
+        ]
+    },
+    {
+        "id": "2c8a4fc78b39a68d",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "删除浮点型母表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "DROP TABLE ct03.bool_data;",
+        "output": "str",
+        "x": 280,
+        "y": 300,
+        "wires": [
+            [
+                "61ef7542a075171c"
+            ]
+        ]
+    },
+    {
+        "id": "312b9064525d8ca5",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "查看母表",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 500,
+        "y": 300,
+        "wires": [
+            [
+                "8325e68e97481372"
+            ]
+        ]
+    },
+    {
+        "id": "8325e68e97481372",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "查看母表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "Show ct03.stables;",
+        "output": "str",
+        "x": 640,
+        "y": 300,
+        "wires": [
+            [
+                "61ef7542a075171c"
+            ]
+        ]
+    },
+    {
+        "id": "8fbcfcd0cdbe5652",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "查看子表",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 820,
+        "y": 300,
+        "wires": [
+            [
+                "1c93829048597dc1"
+            ]
+        ]
+    },
+    {
+        "id": "1c93829048597dc1",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "查看子表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "Show ct03.tables;",
+        "output": "str",
+        "x": 960,
+        "y": 300,
+        "wires": [
+            [
+                "61ef7542a075171c"
+            ]
+        ]
+    },
+    {
+        "id": "1878b326435d743f",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "查看子表",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 400,
+        "wires": [
+            [
+                "828b1be6b5700d54"
+            ]
+        ]
+    },
+    {
+        "id": "828b1be6b5700d54",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "查看子表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "SELECT * FROM ct03.ready;",
+        "output": "str",
+        "x": 260,
+        "y": 400,
+        "wires": [
+            [
+                "ec590ca27ce1cb0a"
+            ]
+        ]
+    },
+    {
+        "id": "8040e2bb8caec8c6",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "注入",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 440,
+        "wires": [
+            [
+                "47117daf5f9eb6d3"
+            ]
+        ]
+    },
+    {
+        "id": "a8b876790e551361",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "写入ready表（布尔母表）",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "INSERT INTO test3.ready using ct03.bool_data tags('ready') values({{timestamp}},{{payload}});",
+        "output": "str",
+        "x": 710,
+        "y": 440,
+        "wires": [
+            [
+                "ec590ca27ce1cb0a"
+            ]
+        ]
+    },
+    {
+        "id": "47117daf5f9eb6d3",
+        "type": "OpcUa-Item",
+        "z": "dcd0afc64dfc7e30",
+        "item": "ns=4;s=MAIN.ready",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取系统启停状态ready",
+        "x": 280,
+        "y": 440,
+        "wires": [
+            [
+                "7cc22d0a2c4fd06a"
+            ]
+        ]
+    },
+    {
+        "id": "7cc22d0a2c4fd06a",
+        "type": "OpcUa-Client",
+        "z": "dcd0afc64dfc7e30",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 480,
+        "y": 440,
+        "wires": [
+            [
+                "c2daf9dec72ec720"
+            ]
+        ]
+    },
+    {
+        "id": "c2daf9dec72ec720",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "加入时间戳",
+        "rules": [
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 470,
+        "y": 400,
+        "wires": [
+            [
+                "a8b876790e551361"
+            ]
+        ]
+    },
+    {
+        "id": "ec590ca27ce1cb0a",
+        "type": "subflow:1ee53fab9037a87f",
+        "z": "dcd0afc64dfc7e30",
+        "name": "",
+        "env": [
+            {
+                "name": "url",
+                "value": "192.168.11.201:6041",
+                "type": "str"
+            },
+            {
+                "name": "username",
+                "value": "root",
+                "type": "str"
+            },
+            {
+                "name": "password",
+                "value": "taosdata",
+                "type": "str"
+            }
+        ],
+        "x": 1480,
+        "y": 820,
+        "wires": [
+            [
+                "e1e9959ce0439958"
+            ]
+        ]
+    },
+    {
+        "id": "e1e9959ce0439958",
+        "type": "debug",
+        "z": "dcd0afc64dfc7e30",
+        "name": "数据库写入",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1630,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "e5ece71286fb0494",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "查看子表",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 520,
+        "wires": [
+            [
+                "a2f0a6879d500830"
+            ]
+        ]
+    },
+    {
+        "id": "a2f0a6879d500830",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "查看子表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "SELECT * FROM ct03.tichu;",
+        "output": "str",
+        "x": 260,
+        "y": 520,
+        "wires": [
+            [
+                "ec590ca27ce1cb0a"
+            ]
+        ]
+    },
+    {
+        "id": "b40608f473e9d874",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "注入",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 560,
+        "wires": [
+            [
+                "4f6203f4cc9d556c"
+            ]
+        ]
+    },
+    {
+        "id": "5e506d5081e7cbfd",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "写入tichu表（布尔母表）",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "INSERT INTO ct03.tichu using ct03.bool_data tags('tichu') values({{timestamp}},{{payload}});",
+        "output": "str",
+        "x": 710,
+        "y": 560,
+        "wires": [
+            [
+                "ec590ca27ce1cb0a"
+            ]
+        ]
+    },
+    {
+        "id": "4f6203f4cc9d556c",
+        "type": "OpcUa-Item",
+        "z": "dcd0afc64dfc7e30",
+        "item": "ns=4;s=MAIN.tichu",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取剔除状态tichu",
+        "x": 260,
+        "y": 560,
+        "wires": [
+            [
+                "5fd15418fd1257ee"
+            ]
+        ]
+    },
+    {
+        "id": "5fd15418fd1257ee",
+        "type": "OpcUa-Client",
+        "z": "dcd0afc64dfc7e30",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 480,
+        "y": 560,
+        "wires": [
+            [
+                "5e03ad2be0236d1e"
+            ]
+        ]
+    },
+    {
+        "id": "5e03ad2be0236d1e",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "加入时间戳",
+        "rules": [
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 470,
+        "y": 520,
+        "wires": [
+            [
+                "5e506d5081e7cbfd"
+            ]
+        ]
+    },
+    {
+        "id": "5371447182925fba",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "查看子表",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 660,
+        "wires": [
+            [
+                "72691511ed01580c"
+            ]
+        ]
+    },
+    {
+        "id": "72691511ed01580c",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "查看子表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "SELECT * FROM ct03.act_speed1_step;",
+        "output": "str",
+        "x": 260,
+        "y": 660,
+        "wires": [
+            [
+                "ec590ca27ce1cb0a"
+            ]
+        ]
+    },
+    {
+        "id": "ee49a114c846b802",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "注入",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 700,
+        "wires": [
+            [
+                "eb176f39fdbf1f1f"
+            ]
+        ]
+    },
+    {
+        "id": "5ac70e527828fc4d",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "写入act_speed1_step表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "INSERT INTO test3.act_speed1_step using ct03.float_data tags('act_speed1_step') values({{timestamp}},{{payload}});",
+        "output": "str",
+        "x": 790,
+        "y": 700,
+        "wires": [
+            [
+                "ec590ca27ce1cb0a"
+            ]
+        ]
+    },
+    {
+        "id": "eb176f39fdbf1f1f",
+        "type": "OpcUa-Item",
+        "z": "dcd0afc64dfc7e30",
+        "item": "ns=4;s=MAIN.act_speed1_step",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取步进电机速度act_speed1_step",
+        "x": 320,
+        "y": 700,
+        "wires": [
+            [
+                "eafe35b46d1badb7"
+            ]
+        ]
+    },
+    {
+        "id": "eafe35b46d1badb7",
+        "type": "OpcUa-Client",
+        "z": "dcd0afc64dfc7e30",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 560,
+        "y": 700,
+        "wires": [
+            [
+                "d7e614243a88da04"
+            ]
+        ]
+    },
+    {
+        "id": "d7e614243a88da04",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "加入时间戳",
+        "rules": [
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 550,
+        "y": 660,
+        "wires": [
+            [
+                "5ac70e527828fc4d"
+            ]
+        ]
+    },
+    {
+        "id": "026e251497f8436f",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "查看子表",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 780,
+        "wires": [
+            [
+                "4392164975bc82c8"
+            ]
+        ]
+    },
+    {
+        "id": "4392164975bc82c8",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "查看子表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "SELECT * FROM ct03.act_speed2_amk;",
+        "output": "str",
+        "x": 260,
+        "y": 780,
+        "wires": [
+            [
+                "ec590ca27ce1cb0a"
+            ]
+        ]
+    },
+    {
+        "id": "3592b5f6246e6559",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "注入",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 820,
+        "wires": [
+            [
+                "932dcfe8d9049eb0"
+            ]
+        ]
+    },
+    {
+        "id": "16dd26c380b056b5",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "写入act_speed2_amk表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "INSERT INTO test3.act_speed2_amk using ct03.float_data tags('act_speed2_amk') values({{timestamp}},{{payload}});",
+        "output": "str",
+        "x": 790,
+        "y": 820,
+        "wires": [
+            [
+                "ec590ca27ce1cb0a"
+            ]
+        ]
+    },
+    {
+        "id": "932dcfe8d9049eb0",
+        "type": "OpcUa-Item",
+        "z": "dcd0afc64dfc7e30",
+        "item": "ns=4;s=MAIN.act_speed2_amk",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取皮带电机速度act_speed2_amk",
+        "x": 320,
+        "y": 820,
+        "wires": [
+            [
+                "a19004ef56c1ac21"
+            ]
+        ]
+    },
+    {
+        "id": "a19004ef56c1ac21",
+        "type": "OpcUa-Client",
+        "z": "dcd0afc64dfc7e30",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 560,
+        "y": 820,
+        "wires": [
+            [
+                "2c43c26dca0f17f9"
+            ]
+        ]
+    },
+    {
+        "id": "2c43c26dca0f17f9",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "加入时间戳",
+        "rules": [
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 550,
+        "y": 780,
+        "wires": [
+            [
+                "16dd26c380b056b5"
+            ]
+        ]
+    },
+    {
+        "id": "96da452f124039e9",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "查看子表",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 900,
+        "wires": [
+            [
+                "ea4b12b0b4186849"
+            ]
+        ]
+    },
+    {
+        "id": "ea4b12b0b4186849",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "查看子表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "SELECT * FROM ct03.heat;",
+        "output": "str",
+        "x": 260,
+        "y": 900,
+        "wires": [
+            [
+                "ec590ca27ce1cb0a"
+            ]
+        ]
+    },
+    {
+        "id": "36652d6ea5d0e578",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "注入",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 940,
+        "wires": [
+            [
+                "beee6db52351532f"
+            ]
+        ]
+    },
+    {
+        "id": "9c2e79dc14a76e20",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "写入heat表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "INSERT INTO ct03.heat using ct03.float_data tags('heat') values({{timestamp}},{{payload}});",
+        "output": "str",
+        "x": 750,
+        "y": 940,
+        "wires": [
+            [
+                "ec590ca27ce1cb0a"
+            ]
+        ]
+    },
+    {
+        "id": "beee6db52351532f",
+        "type": "OpcUa-Item",
+        "z": "dcd0afc64dfc7e30",
+        "item": "ns=4;s=MAIN.heat",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取控制电柜内温度heat",
+        "x": 280,
+        "y": 940,
+        "wires": [
+            [
+                "5fb7bd74d07884e6"
+            ]
+        ]
+    },
+    {
+        "id": "5fb7bd74d07884e6",
+        "type": "OpcUa-Client",
+        "z": "dcd0afc64dfc7e30",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 560,
+        "y": 940,
+        "wires": [
+            [
+                "db91e4a734c555d5"
+            ]
+        ]
+    },
+    {
+        "id": "db91e4a734c555d5",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "加入时间戳",
+        "rules": [
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 550,
+        "y": 900,
+        "wires": [
+            [
+                "9c2e79dc14a76e20"
+            ]
+        ]
+    },
+    {
+        "id": "5a62dd43ddc3975c",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "查看子表",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 1020,
+        "wires": [
+            [
+                "893e03e82f793480"
+            ]
+        ]
+    },
+    {
+        "id": "893e03e82f793480",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "查看子表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "SELECT * FROM ct03.tichuC;",
+        "output": "str",
+        "x": 260,
+        "y": 1020,
+        "wires": [
+            [
+                "ec590ca27ce1cb0a"
+            ]
+        ]
+    },
+    {
+        "id": "f411d8f7d24dcdfd",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "注入",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 1060,
+        "wires": [
+            [
+                "11545aafe5cc0074"
+            ]
+        ]
+    },
+    {
+        "id": "17a736c6ac8ff730",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "写入tichuC表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "INSERT INTO ct03.tichuC using ct03.float_data tags('tichuC') values({{timestamp}},{{payload}});",
+        "output": "str",
+        "x": 750,
+        "y": 1060,
+        "wires": [
+            [
+                "ec590ca27ce1cb0a"
+            ]
+        ]
+    },
+    {
+        "id": "11545aafe5cc0074",
+        "type": "OpcUa-Item",
+        "z": "dcd0afc64dfc7e30",
+        "item": "ns=4;s=MAIN.tichuC",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取剔除总数tichuC",
+        "x": 270,
+        "y": 1060,
+        "wires": [
+            [
+                "f4fc6457cf1baa85"
+            ]
+        ]
+    },
+    {
+        "id": "f4fc6457cf1baa85",
+        "type": "OpcUa-Client",
+        "z": "dcd0afc64dfc7e30",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 560,
+        "y": 1060,
+        "wires": [
+            [
+                "749f5b3132ac81c5"
+            ]
+        ]
+    },
+    {
+        "id": "749f5b3132ac81c5",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "加入时间戳",
+        "rules": [
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 550,
+        "y": 1020,
+        "wires": [
+            [
+                "17a736c6ac8ff730"
+            ]
+        ]
+    },
+    {
+        "id": "cac7e44fd71ed6f3",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "查看子表",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 1140,
+        "wires": [
+            [
+                "065a99cb311127ab"
+            ]
+        ]
+    },
+    {
+        "id": "065a99cb311127ab",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "查看子表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "SELECT * FROM ct03.yunxingC;",
+        "output": "str",
+        "x": 260,
+        "y": 1140,
+        "wires": [
+            [
+                "ec590ca27ce1cb0a"
+            ]
+        ]
+    },
+    {
+        "id": "12047d4e15c756f4",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "注入",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 1180,
+        "wires": [
+            [
+                "e6bc3b015ef10007"
+            ]
+        ]
+    },
+    {
+        "id": "d0d7781eae4dbae7",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "写入yunxingC表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "INSERT INTO ct03.yunxingC using ct03.float_data tags('yunxingC') values({{timestamp}},{{payload}});",
+        "output": "str",
+        "x": 760,
+        "y": 1180,
+        "wires": [
+            [
+                "ec590ca27ce1cb0a"
+            ]
+        ]
+    },
+    {
+        "id": "e6bc3b015ef10007",
+        "type": "OpcUa-Item",
+        "z": "dcd0afc64dfc7e30",
+        "item": "ns=4;s=MAIN.yunxingC",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取运行总数yunxingC",
+        "x": 280,
+        "y": 1180,
+        "wires": [
+            [
+                "d6f7672b95c39ea0"
+            ]
+        ]
+    },
+    {
+        "id": "d6f7672b95c39ea0",
+        "type": "OpcUa-Client",
+        "z": "dcd0afc64dfc7e30",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 560,
+        "y": 1180,
+        "wires": [
+            [
+                "bfa04f78d9419732"
+            ]
+        ]
+    },
+    {
+        "id": "bfa04f78d9419732",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "加入时间戳",
+        "rules": [
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 550,
+        "y": 1140,
+        "wires": [
+            [
+                "d0d7781eae4dbae7"
+            ]
+        ]
+    },
+    {
+        "id": "a313b826b44342e9",
+        "type": "OpcUa-Item",
+        "z": "dcd0afc64dfc7e30",
+        "item": "ns=4;s=MAIN.tichuC",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取剔除总数tichuC",
+        "x": 290,
+        "y": 1300,
+        "wires": [
+            [
+                "9db0e29ab2def0e3"
+            ]
+        ]
+    },
+    {
+        "id": "9db0e29ab2def0e3",
+        "type": "OpcUa-Client",
+        "z": "dcd0afc64dfc7e30",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 480,
+        "y": 1300,
+        "wires": [
+            [
+                "a9abfa7d352ec28b"
+            ]
+        ]
+    },
+    {
+        "id": "a9abfa7d352ec28b",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "tichuC",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 660,
+        "y": 1300,
+        "wires": [
+            [
+                "813e2731634ade08"
+            ]
+        ]
+    },
+    {
+        "id": "813e2731634ade08",
+        "type": "OpcUa-Item",
+        "z": "dcd0afc64dfc7e30",
+        "item": "ns=4;s=MAIN.yunxingC",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取运行总数yunxingC",
+        "x": 280,
+        "y": 1340,
+        "wires": [
+            [
+                "1ef1cca87b45febf"
+            ]
+        ]
+    },
+    {
+        "id": "1ef1cca87b45febf",
+        "type": "OpcUa-Client",
+        "z": "dcd0afc64dfc7e30",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 480,
+        "y": 1340,
+        "wires": [
+            [
+                "8ea59f4bf69ad188"
+            ]
+        ]
+    },
+    {
+        "id": "8ea59f4bf69ad188",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "yunxingC",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 670,
+        "y": 1340,
+        "wires": [
+            [
+                "eb5c11411391a546"
+            ]
+        ]
+    },
+    {
+        "id": "eb5c11411391a546",
+        "type": "function",
+        "z": "dcd0afc64dfc7e30",
+        "name": "计算fpy",
+        "func": "msg.fpy = (msg.yunxingC - msg.tichu)/msg.yunxingC;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 860,
+        "y": 1320,
+        "wires": [
+            [
+                "56d677f9091902ef"
+            ]
+        ]
+    },
+    {
+        "id": "a41ae046c94f7e5f",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "注入",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 1300,
+        "wires": [
+            [
+                "a313b826b44342e9"
+            ]
+        ]
+    },
+    {
+        "id": "20baebcf82099cea",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "写入fpy表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "INSERT INTO ct03.fpy using ct03.float_data tags('fpy') values({{timestamp}},{{payload}});",
+        "output": "str",
+        "x": 1160,
+        "y": 1320,
+        "wires": [
+            [
+                "ec590ca27ce1cb0a"
+            ]
+        ]
+    },
+    {
+        "id": "56d677f9091902ef",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "加入时间戳",
+        "rules": [
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1010,
+        "y": 1320,
+        "wires": [
+            [
+                "20baebcf82099cea"
+            ]
+        ]
+    },
+    {
+        "id": "061a6f967ee5f1aa",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "查看子表",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 1260,
+        "wires": [
+            [
+                "95f82e3fa1b9901d"
+            ]
+        ]
+    },
+    {
+        "id": "95f82e3fa1b9901d",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "查看子表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "SELECT * FROM ct03.fpy;",
+        "output": "str",
+        "x": 260,
+        "y": 1260,
+        "wires": [
+            [
+                "ec590ca27ce1cb0a"
+            ]
+        ]
+    },
+    {
+        "id": "4105300b2d27b8a8",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "查看子表",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 1420,
+        "wires": [
+            [
+                "dfab79699f94ac0a"
+            ]
+        ]
+    },
+    {
+        "id": "dfab79699f94ac0a",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "查看子表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "SELECT * FROM ct03.tichuMinute;",
+        "output": "str",
+        "x": 260,
+        "y": 1420,
+        "wires": [
+            [
+                "ec590ca27ce1cb0a"
+            ]
+        ]
+    },
+    {
+        "id": "c51d06943832f408",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "d": true,
+        "name": "注入",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "300",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 1460,
+        "wires": [
+            [
+                "cd95057511e286e6"
+            ]
+        ]
+    },
+    {
+        "id": "8f1d69ce315427bd",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "写入tichuMinute表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "INSERT INTO ct03.tichuMinute using ct03.float_data tags('tichuMinute') values({{timestamp}},{{payload}});",
+        "output": "str",
+        "x": 1110,
+        "y": 1440,
+        "wires": [
+            [
+                "ec590ca27ce1cb0a"
+            ]
+        ]
+    },
+    {
+        "id": "cd95057511e286e6",
+        "type": "OpcUa-Item",
+        "z": "dcd0afc64dfc7e30",
+        "item": "ns=4;s=MAIN.tichuC",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取剔除总数tichuC",
+        "x": 270,
+        "y": 1460,
+        "wires": [
+            [
+                "c1b7476480c36de7"
+            ]
+        ]
+    },
+    {
+        "id": "c1b7476480c36de7",
+        "type": "OpcUa-Client",
+        "z": "dcd0afc64dfc7e30",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 460,
+        "y": 1460,
+        "wires": [
+            [
+                "03141eb68c7041e9"
+            ]
+        ]
+    },
+    {
+        "id": "03141eb68c7041e9",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "加入时间戳",
+        "rules": [
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 450,
+        "y": 1420,
+        "wires": [
+            [
+                "86dbd7dbbd9b440c"
+            ]
+        ]
+    },
+    {
+        "id": "86dbd7dbbd9b440c",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "lastRecord",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 680,
+        "y": 1440,
+        "wires": [
+            [
+                "3166ae833a19f4a4"
+            ]
+        ]
+    },
+    {
+        "id": "3166ae833a19f4a4",
+        "type": "function",
+        "z": "dcd0afc64dfc7e30",
+        "name": "计算每五分钟剔除总数",
+        "func": "msg.payload = msg.payload - msg.lastRecord;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 900,
+        "y": 1440,
+        "wires": [
+            [
+                "8f1d69ce315427bd"
+            ]
+        ]
+    },
+    {
+        "id": "7a32e9597e39174e",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "d": true,
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 1580,
+        "wires": [
+            [
+                "0c86648fc278c6fe"
+            ]
+        ]
+    },
+    {
+        "id": "e333b1bfcf1578fd",
+        "type": "debug",
+        "z": "dcd0afc64dfc7e30",
+        "name": "步进电机计数",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1300,
+        "y": 1520,
+        "wires": []
+    },
+    {
+        "id": "118789c0e18b3ace",
+        "type": "switch",
+        "z": "dcd0afc64dfc7e30",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 750,
+        "y": 1580,
+        "wires": [
+            [
+                "baa5e38a5015e24e"
+            ],
+            [
+                "3e7a8805b51751b1"
+            ]
+        ]
+    },
+    {
+        "id": "0c86648fc278c6fe",
+        "type": "OpcUa-Item",
+        "z": "dcd0afc64dfc7e30",
+        "item": "ns=4;s=MAIN.act_speed1_step",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取步进电机速度act_speed1_step",
+        "x": 360,
+        "y": 1580,
+        "wires": [
+            [
+                "b137392d50fba616"
+            ]
+        ]
+    },
+    {
+        "id": "b137392d50fba616",
+        "type": "OpcUa-Client",
+        "z": "dcd0afc64dfc7e30",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 600,
+        "y": 1580,
+        "wires": [
+            [
+                "118789c0e18b3ace"
+            ]
+        ]
+    },
+    {
+        "id": "baa5e38a5015e24e",
+        "type": "function",
+        "z": "dcd0afc64dfc7e30",
+        "name": "步进电机运行秒数+1",
+        "func": "global.StepOn ++;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 940,
+        "y": 1560,
+        "wires": [
+            [
+                "b230686d4f4e1d14"
+            ]
+        ]
+    },
+    {
+        "id": "ffa85a97b3fc48d4",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "步进电机置0",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 1540,
+        "wires": [
+            [
+                "67de5d24ced117f2"
+            ]
+        ]
+    },
+    {
+        "id": "7ad68fa62f95bb17",
+        "type": "debug",
+        "z": "dcd0afc64dfc7e30",
+        "name": "步进电机计数置0",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 710,
+        "y": 1540,
+        "wires": []
+    },
+    {
+        "id": "67de5d24ced117f2",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "StepOn",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 310,
+        "y": 1540,
+        "wires": [
+            [
+                "f2477370b52c815b"
+            ]
+        ]
+    },
+    {
+        "id": "83956b7bb2d3a2d8",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "StepOn",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1310,
+        "y": 1560,
+        "wires": [
+            [
+                "e333b1bfcf1578fd",
+                "476fb1d471906791"
+            ]
+        ]
+    },
+    {
+        "id": "f2477370b52c815b",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "StepOn",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 510,
+        "y": 1540,
+        "wires": [
+            [
+                "7ad68fa62f95bb17"
+            ]
+        ]
+    },
+    {
+        "id": "476fb1d471906791",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "写入StepOn表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "INSERT INTO ct03.StepOn using ct03.float_data tags('StepOn') values({{timestamp}},{{payload}});",
+        "output": "str",
+        "x": 1540,
+        "y": 1580,
+        "wires": [
+            [
+                "ec590ca27ce1cb0a"
+            ]
+        ]
+    },
+    {
+        "id": "b230686d4f4e1d14",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "加入时间戳",
+        "rules": [
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1130,
+        "y": 1560,
+        "wires": [
+            [
+                "83956b7bb2d3a2d8"
+            ]
+        ]
+    },
+    {
+        "id": "8ccb1f23e0e37bad",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "StepOn",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1110,
+        "y": 1600,
+        "wires": [
+            [
+                "476fb1d471906791",
+                "43096de2bc5aceb9"
+            ]
+        ]
+    },
+    {
+        "id": "3e7a8805b51751b1",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "加入时间戳",
+        "rules": [
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 910,
+        "y": 1600,
+        "wires": [
+            [
+                "8ccb1f23e0e37bad"
+            ]
+        ]
+    },
+    {
+        "id": "43096de2bc5aceb9",
+        "type": "debug",
+        "z": "dcd0afc64dfc7e30",
+        "name": "步进电机计数",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1300,
+        "y": 1640,
+        "wires": []
+    },
+    {
+        "id": "df52f1dd07476992",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "d": true,
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 1760,
+        "wires": [
+            [
+                "156c0c22ad242cfd"
+            ]
+        ]
+    },
+    {
+        "id": "9cc42f85e163e08e",
+        "type": "debug",
+        "z": "dcd0afc64dfc7e30",
+        "name": "皮带电机计数",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1300,
+        "y": 1700,
+        "wires": []
+    },
+    {
+        "id": "a46f5c7be220df0f",
+        "type": "switch",
+        "z": "dcd0afc64dfc7e30",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 750,
+        "y": 1760,
+        "wires": [
+            [
+                "c71efbae8e648d7b"
+            ],
+            [
+                "e40d1c7377aa329c"
+            ]
+        ]
+    },
+    {
+        "id": "156c0c22ad242cfd",
+        "type": "OpcUa-Item",
+        "z": "dcd0afc64dfc7e30",
+        "item": "ns=4;s=MAIN.act_speed2_amk",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取步进电机速度act_speed2_amk",
+        "x": 360,
+        "y": 1760,
+        "wires": [
+            [
+                "14c759c81a42ce4d"
+            ]
+        ]
+    },
+    {
+        "id": "14c759c81a42ce4d",
+        "type": "OpcUa-Client",
+        "z": "dcd0afc64dfc7e30",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 600,
+        "y": 1760,
+        "wires": [
+            [
+                "a46f5c7be220df0f"
+            ]
+        ]
+    },
+    {
+        "id": "c71efbae8e648d7b",
+        "type": "function",
+        "z": "dcd0afc64dfc7e30",
+        "name": "皮带电机运行秒数+1",
+        "func": "global.AmkOn ++;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 940,
+        "y": 1740,
+        "wires": [
+            [
+                "0b7f183dd0b6ff10"
+            ]
+        ]
+    },
+    {
+        "id": "7faed0c9a429f159",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "皮带电机置0",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 1720,
+        "wires": [
+            [
+                "190a1c4df52e0a9d"
+            ]
+        ]
+    },
+    {
+        "id": "98c08427fa4f5ac7",
+        "type": "debug",
+        "z": "dcd0afc64dfc7e30",
+        "name": "皮带电机计数置0",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 710,
+        "y": 1720,
+        "wires": []
+    },
+    {
+        "id": "190a1c4df52e0a9d",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "AmkOn",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 310,
+        "y": 1720,
+        "wires": [
+            [
+                "dad00505303303a1"
+            ]
+        ]
+    },
+    {
+        "id": "4f0f41b110c19d09",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "AmkOn",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1310,
+        "y": 1740,
+        "wires": [
+            [
+                "9cc42f85e163e08e",
+                "81c5e8ea5b783d7d"
+            ]
+        ]
+    },
+    {
+        "id": "dad00505303303a1",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "AmkOn",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 510,
+        "y": 1720,
+        "wires": [
+            [
+                "98c08427fa4f5ac7"
+            ]
+        ]
+    },
+    {
+        "id": "81c5e8ea5b783d7d",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "写入AmkOn表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "INSERT INTO ct03.AmkOn using ct03.float_data tags('AmkOn') values({{timestamp}},{{payload}});",
+        "output": "str",
+        "x": 1540,
+        "y": 1760,
+        "wires": [
+            [
+                "ec590ca27ce1cb0a"
+            ]
+        ]
+    },
+    {
+        "id": "0b7f183dd0b6ff10",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "加入时间戳",
+        "rules": [
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1130,
+        "y": 1740,
+        "wires": [
+            [
+                "4f0f41b110c19d09"
+            ]
+        ]
+    },
+    {
+        "id": "0874e26097874f9d",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "AmkOn",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1110,
+        "y": 1780,
+        "wires": [
+            [
+                "81c5e8ea5b783d7d",
+                "a5a7502ae2932a05"
+            ]
+        ]
+    },
+    {
+        "id": "e40d1c7377aa329c",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "加入时间戳",
+        "rules": [
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 910,
+        "y": 1780,
+        "wires": [
+            [
+                "0874e26097874f9d"
+            ]
+        ]
+    },
+    {
+        "id": "a5a7502ae2932a05",
+        "type": "debug",
+        "z": "dcd0afc64dfc7e30",
+        "name": "皮带电机计数",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1300,
+        "y": 1820,
+        "wires": []
+    },
+    {
+        "id": "b7eea21a23e38d75",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "d": true,
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 1940,
+        "wires": [
+            [
+                "f558e4fa965e8524"
+            ]
+        ]
+    },
+    {
+        "id": "790174e088fd9beb",
+        "type": "debug",
+        "z": "dcd0afc64dfc7e30",
+        "name": "系统时间计数",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1340,
+        "y": 1880,
+        "wires": []
+    },
+    {
+        "id": "ea8ac4d230acacb6",
+        "type": "switch",
+        "z": "dcd0afc64dfc7e30",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "TRUE",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 710,
+        "y": 1940,
+        "wires": [
+            [
+                "6d8907ac702d6ed9"
+            ],
+            [
+                "b06266886b66aa04"
+            ]
+        ]
+    },
+    {
+        "id": "6d8907ac702d6ed9",
+        "type": "function",
+        "z": "dcd0afc64dfc7e30",
+        "name": "系统运行秒数+1",
+        "func": "global.SystemOn ++;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 960,
+        "y": 1920,
+        "wires": [
+            [
+                "e01254d227195d1f"
+            ]
+        ]
+    },
+    {
+        "id": "36a23ecc3a1c7e18",
+        "type": "inject",
+        "z": "dcd0afc64dfc7e30",
+        "name": "系统运行时间置0",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 1900,
+        "wires": [
+            [
+                "5a9cd8a85d930a8b"
+            ]
+        ]
+    },
+    {
+        "id": "fea7e47b17fba113",
+        "type": "debug",
+        "z": "dcd0afc64dfc7e30",
+        "name": "系统运行时间置0",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 750,
+        "y": 1900,
+        "wires": []
+    },
+    {
+        "id": "5a9cd8a85d930a8b",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "SystemOn",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 340,
+        "y": 1900,
+        "wires": [
+            [
+                "9b415a5c6ada14e4"
+            ]
+        ]
+    },
+    {
+        "id": "aa7c6c373c3f5cc2",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "SystemOn",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1350,
+        "y": 1920,
+        "wires": [
+            [
+                "790174e088fd9beb",
+                "d9407bb108f823d2"
+            ]
+        ]
+    },
+    {
+        "id": "9b415a5c6ada14e4",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "AmkOn",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 550,
+        "y": 1900,
+        "wires": [
+            [
+                "fea7e47b17fba113"
+            ]
+        ]
+    },
+    {
+        "id": "d9407bb108f823d2",
+        "type": "template",
+        "z": "dcd0afc64dfc7e30",
+        "name": "写入SystemOn表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "INSERT INTO ct03.SystemOn using ct03.float_data tags('SystemOn') values({{timestamp}},{{payload}});",
+        "output": "str",
+        "x": 1590,
+        "y": 1940,
+        "wires": [
+            [
+                "ec590ca27ce1cb0a"
+            ]
+        ]
+    },
+    {
+        "id": "e01254d227195d1f",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "加入时间戳",
+        "rules": [
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1130,
+        "y": 1920,
+        "wires": [
+            [
+                "aa7c6c373c3f5cc2"
+            ]
+        ]
+    },
+    {
+        "id": "9fb24d2c79ced93e",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "SystemOn",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1150,
+        "y": 1960,
+        "wires": [
+            [
+                "d9407bb108f823d2",
+                "c5039d823f7bbf3f"
+            ]
+        ]
+    },
+    {
+        "id": "b06266886b66aa04",
+        "type": "change",
+        "z": "dcd0afc64dfc7e30",
+        "name": "加入时间戳",
+        "rules": [
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 950,
+        "y": 1960,
+        "wires": [
+            [
+                "9fb24d2c79ced93e"
+            ]
+        ]
+    },
+    {
+        "id": "c5039d823f7bbf3f",
+        "type": "debug",
+        "z": "dcd0afc64dfc7e30",
+        "name": "系统时间计数",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1340,
+        "y": 2000,
+        "wires": []
+    },
+    {
+        "id": "f558e4fa965e8524",
+        "type": "OpcUa-Item",
+        "z": "dcd0afc64dfc7e30",
+        "item": "ns=4;s=MAIN.ready",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取系统启停状态ready",
+        "x": 320,
+        "y": 1940,
+        "wires": [
+            [
+                "87b541ab7cbb949e"
+            ]
+        ]
+    },
+    {
+        "id": "87b541ab7cbb949e",
+        "type": "OpcUa-Client",
+        "z": "dcd0afc64dfc7e30",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 520,
+        "y": 1940,
+        "wires": [
+            [
+                "ea8ac4d230acacb6"
+            ]
+        ]
+    },
+    {
+        "id": "dc536377fd6a45bb",
+        "type": "http in",
+        "z": "3be9767593524592",
+        "name": "",
+        "url": "/ready",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 120,
+        "y": 40,
+        "wires": [
+            [
+                "c6e9c680eee39c00"
+            ]
+        ]
+    },
+    {
+        "id": "7f518fc8083fab46",
+        "type": "http response",
+        "z": "3be9767593524592",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 870,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "c6e9c680eee39c00",
+        "type": "OpcUa-Item",
+        "z": "3be9767593524592",
+        "item": "ns=4;s=MAIN.ready",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取系统启停状态ready",
+        "x": 300,
+        "y": 40,
+        "wires": [
+            [
+                "1c0962790111bcb1"
+            ]
+        ]
+    },
+    {
+        "id": "1c0962790111bcb1",
+        "type": "OpcUa-Client",
+        "z": "3be9767593524592",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 500,
+        "y": 40,
+        "wires": [
+            [
+                "a4b6415ead3a799b"
+            ]
+        ]
+    },
+    {
+        "id": "a4b6415ead3a799b",
+        "type": "change",
+        "z": "3be9767593524592",
+        "name": "",
+        "rules": [
+            {
+                "t": "delete",
+                "p": "statusCode",
+                "pt": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 700,
+        "y": 40,
+        "wires": [
+            [
+                "7f518fc8083fab46"
+            ]
+        ]
+    },
+    {
+        "id": "c3079ade6a0aa378",
+        "type": "http in",
+        "z": "3be9767593524592",
+        "name": "",
+        "url": "/tichuC",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 100,
+        "wires": [
+            [
+                "54dc0e131c829b46"
+            ]
+        ]
+    },
+    {
+        "id": "5c6d97cc8824414f",
+        "type": "http response",
+        "z": "3be9767593524592",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 870,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "54dc0e131c829b46",
+        "type": "OpcUa-Item",
+        "z": "3be9767593524592",
+        "item": "ns=4;s=MAIN.tichuC",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取剔除总数tichuC",
+        "x": 310,
+        "y": 100,
+        "wires": [
+            [
+                "6c11315165094c1b"
+            ]
+        ]
+    },
+    {
+        "id": "6c11315165094c1b",
+        "type": "OpcUa-Client",
+        "z": "3be9767593524592",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 500,
+        "y": 100,
+        "wires": [
+            [
+                "eb26cc0f561934f1"
+            ]
+        ]
+    },
+    {
+        "id": "eb26cc0f561934f1",
+        "type": "change",
+        "z": "3be9767593524592",
+        "name": "",
+        "rules": [
+            {
+                "t": "delete",
+                "p": "statusCode",
+                "pt": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 700,
+        "y": 100,
+        "wires": [
+            [
+                "5c6d97cc8824414f"
+            ]
+        ]
+    },
+    {
+        "id": "bb2f40ef388b6f33",
+        "type": "http in",
+        "z": "3be9767593524592",
+        "name": "",
+        "url": "/fpy",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 120,
+        "y": 160,
+        "wires": [
+            [
+                "dc139a6f7d1c9890"
+            ]
+        ]
+    },
+    {
+        "id": "60fbd4ae80385db2",
+        "type": "http response",
+        "z": "3be9767593524592",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1430,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "dc139a6f7d1c9890",
+        "type": "OpcUa-Item",
+        "z": "3be9767593524592",
+        "item": "ns=4;s=MAIN.tichuC",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取剔除总数tichuC",
+        "x": 310,
+        "y": 160,
+        "wires": [
+            [
+                "635004a8a09d016c"
+            ]
+        ]
+    },
+    {
+        "id": "635004a8a09d016c",
+        "type": "OpcUa-Client",
+        "z": "3be9767593524592",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 500,
+        "y": 160,
+        "wires": [
+            [
+                "3f87f3cd8b761c10"
+            ]
+        ]
+    },
+    {
+        "id": "b7f0d6fc4f04c06c",
+        "type": "change",
+        "z": "3be9767593524592",
+        "name": "",
+        "rules": [
+            {
+                "t": "delete",
+                "p": "statusCode",
+                "pt": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1260,
+        "y": 180,
+        "wires": [
+            [
+                "60fbd4ae80385db2"
+            ]
+        ]
+    },
+    {
+        "id": "3f87f3cd8b761c10",
+        "type": "change",
+        "z": "3be9767593524592",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "tichuC",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 680,
+        "y": 160,
+        "wires": [
+            [
+                "4848273c569b73ea"
+            ]
+        ]
+    },
+    {
+        "id": "4848273c569b73ea",
+        "type": "OpcUa-Item",
+        "z": "3be9767593524592",
+        "item": "ns=4;s=MAIN.yunxingC",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取运行总数yunxingC",
+        "x": 300,
+        "y": 200,
+        "wires": [
+            [
+                "9757aa406f5608cd"
+            ]
+        ]
+    },
+    {
+        "id": "9757aa406f5608cd",
+        "type": "OpcUa-Client",
+        "z": "3be9767593524592",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 500,
+        "y": 200,
+        "wires": [
+            [
+                "06ae57fa22a4b4c5"
+            ]
+        ]
+    },
+    {
+        "id": "06ae57fa22a4b4c5",
+        "type": "change",
+        "z": "3be9767593524592",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "yunxingC",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 690,
+        "y": 200,
+        "wires": [
+            [
+                "b9aa737c681b9e9d"
+            ]
+        ]
+    },
+    {
+        "id": "b9aa737c681b9e9d",
+        "type": "function",
+        "z": "3be9767593524592",
+        "name": "计算fpy",
+        "func": "msg.fpy = (msg.yunxingC - msg.tichu)/msg.yunxingC;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 880,
+        "y": 180,
+        "wires": [
+            [
+                "324d1f36625f0a40"
+            ]
+        ]
+    },
+    {
+        "id": "324d1f36625f0a40",
+        "type": "change",
+        "z": "3be9767593524592",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "fpy",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1050,
+        "y": 180,
+        "wires": [
+            [
+                "b7f0d6fc4f04c06c"
+            ]
+        ]
+    },
+    {
+        "id": "3d29ebdeb7d794b6",
+        "type": "http in",
+        "z": "3be9767593524592",
+        "name": "",
+        "url": "/act_speed2_amk",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 160,
+        "y": 280,
+        "wires": [
+            [
+                "a6faabec5904d592"
+            ]
+        ]
+    },
+    {
+        "id": "c26833f4bf6f9cc3",
+        "type": "http response",
+        "z": "3be9767593524592",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1030,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "2ecc3bb648b80695",
+        "type": "change",
+        "z": "3be9767593524592",
+        "name": "",
+        "rules": [
+            {
+                "t": "delete",
+                "p": "statusCode",
+                "pt": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 860,
+        "y": 280,
+        "wires": [
+            [
+                "c26833f4bf6f9cc3"
+            ]
+        ]
+    },
+    {
+        "id": "a6faabec5904d592",
+        "type": "OpcUa-Item",
+        "z": "3be9767593524592",
+        "item": "ns=4;s=MAIN.act_speed2_amk",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取皮带电机速度act_speed2_amk",
+        "x": 420,
+        "y": 280,
+        "wires": [
+            [
+                "b1376a612db5fbc9"
+            ]
+        ]
+    },
+    {
+        "id": "b1376a612db5fbc9",
+        "type": "OpcUa-Client",
+        "z": "3be9767593524592",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 660,
+        "y": 280,
+        "wires": [
+            [
+                "2ecc3bb648b80695"
+            ]
+        ]
+    },
+    {
+        "id": "464e05fe40ecc362",
+        "type": "http in",
+        "z": "3be9767593524592",
+        "name": "",
+        "url": "/signal",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 380,
+        "wires": [
+            [
+                "911726a859502164",
+                "8ee4353f305efcae"
+            ]
+        ]
+    },
+    {
+        "id": "5cd74969dc87770b",
+        "type": "http response",
+        "z": "3be9767593524592",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1350,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "59f2f308dbace4e3",
+        "type": "change",
+        "z": "3be9767593524592",
+        "name": "",
+        "rules": [
+            {
+                "t": "delete",
+                "p": "statusCode",
+                "pt": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1180,
+        "y": 380,
+        "wires": [
+            [
+                "5cd74969dc87770b"
+            ]
+        ]
+    },
+    {
+        "id": "911726a859502164",
+        "type": "OpcUa-Item",
+        "z": "3be9767593524592",
+        "item": "ns=4;s=MAIN.step_daowei",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取步进电机初始位置到位信号step_daowei",
+        "x": 400,
+        "y": 360,
+        "wires": [
+            [
+                "88f520635facda44"
+            ]
+        ]
+    },
+    {
+        "id": "8ee4353f305efcae",
+        "type": "OpcUa-Item",
+        "z": "3be9767593524592",
+        "item": "ns=4;s=MAIN.step_tichu",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取步进电机剔除位置到位信号step_tichu",
+        "x": 400,
+        "y": 400,
+        "wires": [
+            [
+                "88f520635facda44"
+            ]
+        ]
+    },
+    {
+        "id": "88f520635facda44",
+        "type": "OpcUa-Client",
+        "z": "3be9767593524592",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 660,
+        "y": 380,
+        "wires": [
+            [
+                "aba234dc77c99dcb"
+            ]
+        ]
+    },
+    {
+        "id": "aba234dc77c99dcb",
+        "type": "join",
+        "z": "3be9767593524592",
+        "name": "连接两条数据",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "2",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 840,
+        "y": 380,
+        "wires": [
+            [
+                "a0a44e40dfe6969f"
+            ]
+        ]
+    },
+    {
+        "id": "a0a44e40dfe6969f",
+        "type": "function",
+        "z": "3be9767593524592",
+        "name": "数据赋值",
+        "func": "msg.statusCode = 200;\nvar step_daowei = msg.payload['ns=4;s=MAIN.step_daowei'];\nvar step_tichu = msg.payload['ns=4;s=MAIN.step_tichu'];\n\nmsg.payload = {};\nmsg.payload.step_daowei = step_daowei;\nmsg.payload.step_tichu = step_tichu;\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1000,
+        "y": 380,
+        "wires": [
+            [
+                "59f2f308dbace4e3"
+            ]
+        ]
+    },
+    {
+        "id": "c3ce6ed21f1c1668",
+        "type": "http in",
+        "z": "3be9767593524592",
+        "name": "",
+        "url": "/all",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 110,
+        "y": 1400,
+        "wires": [
+            [
+                "18ae392a21a23db7",
+                "f23887a16330d08a",
+                "d4da9149b373f7bb",
+                "869c51fab7d7620a",
+                "e46a6660e2596f3b",
+                "9a2f9515b7c63add"
+            ]
+        ]
+    },
+    {
+        "id": "04632645c361d96c",
+        "type": "http response",
+        "z": "3be9767593524592",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1350,
+        "y": 1400,
+        "wires": []
+    },
+    {
+        "id": "016a96f02c745cc3",
+        "type": "change",
+        "z": "3be9767593524592",
+        "name": "",
+        "rules": [
+            {
+                "t": "delete",
+                "p": "statusCode",
+                "pt": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1180,
+        "y": 1400,
+        "wires": [
+            [
+                "04632645c361d96c"
+            ]
+        ]
+    },
+    {
+        "id": "7f980fedb6a9dfdd",
+        "type": "OpcUa-Client",
+        "z": "3be9767593524592",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 660,
+        "y": 1400,
+        "wires": [
+            [
+                "22e7ca06eea2928f"
+            ]
+        ]
+    },
+    {
+        "id": "22e7ca06eea2928f",
+        "type": "join",
+        "z": "3be9767593524592",
+        "name": "连接六条数据",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "6",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 840,
+        "y": 1400,
+        "wires": [
+            [
+                "96b807ee7fba3f86"
+            ]
+        ]
+    },
+    {
+        "id": "96b807ee7fba3f86",
+        "type": "function",
+        "z": "3be9767593524592",
+        "name": "数据赋值",
+        "func": "msg.statusCode = 200;\nvar step_daowei = msg.payload['ns=4;s=MAIN.step_daowei'];\nvar step_tichu = msg.payload['ns=4;s=MAIN.step_tichu'];\n\nmsg.payload = {};\nmsg.payload.step_daowei = step_daowei;\nmsg.payload.step_tichu = step_tichu;\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1000,
+        "y": 1400,
+        "wires": [
+            [
+                "016a96f02c745cc3"
+            ]
+        ]
+    },
+    {
+        "id": "18ae392a21a23db7",
+        "type": "OpcUa-Item",
+        "z": "3be9767593524592",
+        "item": "ns=4;s=MAIN.ready",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取系统启停状态ready",
+        "x": 360,
+        "y": 1300,
+        "wires": [
+            [
+                "7f980fedb6a9dfdd"
+            ]
+        ]
+    },
+    {
+        "id": "f23887a16330d08a",
+        "type": "OpcUa-Item",
+        "z": "3be9767593524592",
+        "item": "ns=4;s=MAIN.tichu",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取剔除状态tichu",
+        "x": 340,
+        "y": 1340,
+        "wires": [
+            [
+                "7f980fedb6a9dfdd"
+            ]
+        ]
+    },
+    {
+        "id": "d4da9149b373f7bb",
+        "type": "OpcUa-Item",
+        "z": "3be9767593524592",
+        "item": "ns=4;s=MAIN.act_speed1_step",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取步进电机速度act_speed1_step",
+        "x": 400,
+        "y": 1380,
+        "wires": [
+            [
+                "7f980fedb6a9dfdd"
+            ]
+        ]
+    },
+    {
+        "id": "869c51fab7d7620a",
+        "type": "OpcUa-Item",
+        "z": "3be9767593524592",
+        "item": "ns=4;s=MAIN.act_speed2_amk",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取皮带电机速度act_speed2_amk",
+        "x": 400,
+        "y": 1420,
+        "wires": [
+            [
+                "7f980fedb6a9dfdd"
+            ]
+        ]
+    },
+    {
+        "id": "e46a6660e2596f3b",
+        "type": "OpcUa-Item",
+        "z": "3be9767593524592",
+        "item": "ns=4;s=MAIN.tichuC",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取剔除总数tichuC",
+        "x": 350,
+        "y": 1460,
+        "wires": [
+            [
+                "7f980fedb6a9dfdd"
+            ]
+        ]
+    },
+    {
+        "id": "9a2f9515b7c63add",
+        "type": "OpcUa-Item",
+        "z": "3be9767593524592",
+        "item": "ns=4;s=MAIN.yunxingC",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取运行总数yunxingC",
+        "x": 360,
+        "y": 1500,
+        "wires": [
+            [
+                "7f980fedb6a9dfdd"
+            ]
+        ]
+    },
+    {
+        "id": "c999b1b31f11f057",
+        "type": "http in",
+        "z": "3be9767593524592",
+        "name": "",
+        "url": "/sequence/tichuRecord/:BT/:ET",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 200,
+        "y": 620,
+        "wires": [
+            [
+                "e174b49fc897abdb"
+            ]
+        ]
+    },
+    {
+        "id": "36a6c955ae17e955",
+        "type": "http response",
+        "z": "3be9767593524592",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1150,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "e174b49fc897abdb",
+        "type": "change",
+        "z": "3be9767593524592",
+        "name": "预存数据",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "temp._msgid",
+                "pt": "msg",
+                "to": "_msgid",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "temp.res",
+                "pt": "msg",
+                "to": "res",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "temp.req",
+                "pt": "msg",
+                "to": "req",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "BT",
+                "pt": "msg",
+                "to": "req.params.BT",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "ET",
+                "pt": "msg",
+                "to": "req.params.ET",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 420,
+        "y": 620,
+        "wires": [
+            [
+                "1cf7e26567f20c3c"
+            ]
+        ]
+    },
+    {
+        "id": "1cf7e26567f20c3c",
+        "type": "template",
+        "z": "3be9767593524592",
+        "name": "查询时序数据库",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "SELECT * FROM ct03.tichu where ts between BT and ET;",
+        "output": "str",
+        "x": 580,
+        "y": 620,
+        "wires": [
+            [
+                "ccc91d77719248e5"
+            ]
+        ]
+    },
+    {
+        "id": "ccc91d77719248e5",
+        "type": "subflow:1ee53fab9037a87f",
+        "z": "3be9767593524592",
+        "name": "",
+        "env": [
+            {
+                "name": "url",
+                "value": "192.168.11.201:6041",
+                "type": "str"
+            },
+            {
+                "name": "username",
+                "value": "root",
+                "type": "str"
+            },
+            {
+                "name": "password",
+                "value": "taosdata",
+                "type": "str"
+            }
+        ],
+        "x": 740,
+        "y": 620,
+        "wires": [
+            [
+                "77798e340ca7dc30"
+            ]
+        ]
+    },
+    {
+        "id": "77798e340ca7dc30",
+        "type": "change",
+        "z": "3be9767593524592",
+        "name": "取回数据",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.data",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "_msgid",
+                "pt": "msg",
+                "to": "temp._msgid",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "res",
+                "pt": "msg",
+                "to": "temp.res",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "req",
+                "pt": "msg",
+                "to": "temp.req",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "payload.time",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 880,
+        "y": 620,
+        "wires": [
+            [
+                "9a2bb4d080b65ef6"
+            ]
+        ]
+    },
+    {
+        "id": "9a2bb4d080b65ef6",
+        "type": "function",
+        "z": "3be9767593524592",
+        "name": "格式封装",
+        "func": "//msg.payload.time = Date();\nmsg.payload.data = Number(msg.payload);\nmsg.payload = { \"timestamp\": msg.payload.time, \"act_speed1_amk\": msg.payload.data };\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1020,
+        "y": 620,
+        "wires": [
+            [
+                "36a6c955ae17e955"
+            ]
+        ]
+    },
+    {
+        "id": "62f97ceb87f1d098",
+        "type": "http in",
+        "z": "3be9767593524592",
+        "name": "",
+        "url": "/minutesRecord",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 150,
+        "y": 700,
+        "wires": [
+            [
+                "8e5ebe7c81087281"
+            ]
+        ]
+    },
+    {
+        "id": "74bf7d670b493978",
+        "type": "http response",
+        "z": "3be9767593524592",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1150,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "8e5ebe7c81087281",
+        "type": "change",
+        "z": "3be9767593524592",
+        "name": "预存数据",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "temp._msgid",
+                "pt": "msg",
+                "to": "_msgid",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "temp.res",
+                "pt": "msg",
+                "to": "res",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "temp.req",
+                "pt": "msg",
+                "to": "req",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 420,
+        "y": 700,
+        "wires": [
+            [
+                "142fafd39081d9f9"
+            ]
+        ]
+    },
+    {
+        "id": "142fafd39081d9f9",
+        "type": "template",
+        "z": "3be9767593524592",
+        "name": "查询tichuMinute表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "SELECT * FROM ct03.tichuMinute;",
+        "output": "str",
+        "x": 590,
+        "y": 700,
+        "wires": [
+            [
+                "213b9cd34886cda8"
+            ]
+        ]
+    },
+    {
+        "id": "213b9cd34886cda8",
+        "type": "subflow:1ee53fab9037a87f",
+        "z": "3be9767593524592",
+        "name": "",
+        "env": [
+            {
+                "name": "url",
+                "value": "192.168.11.201:6041",
+                "type": "str"
+            },
+            {
+                "name": "username",
+                "value": "root",
+                "type": "str"
+            },
+            {
+                "name": "password",
+                "value": "taosdata",
+                "type": "str"
+            }
+        ],
+        "x": 760,
+        "y": 700,
+        "wires": [
+            [
+                "e7d0be2ebe8ee7fa"
+            ]
+        ]
+    },
+    {
+        "id": "e7d0be2ebe8ee7fa",
+        "type": "change",
+        "z": "3be9767593524592",
+        "name": "取回数据",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.data",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "_msgid",
+                "pt": "msg",
+                "to": "temp._msgid",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "res",
+                "pt": "msg",
+                "to": "temp.res",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "req",
+                "pt": "msg",
+                "to": "temp.req",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 900,
+        "y": 700,
+        "wires": [
+            [
+                "74bf7d670b493978"
+            ]
+        ]
+    },
+    {
+        "id": "e4989b4067c3ee8a",
+        "type": "http in",
+        "z": "3be9767593524592",
+        "name": "",
+        "url": "/allSequence",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 150,
+        "y": 860,
+        "wires": [
+            [
+                "a85c57ce421112de",
+                "86ed1b3025348fa3",
+                "2839cdda54cdd71f",
+                "5a1f23fccd5ff964",
+                "71892b2e4b7c51a6",
+                "e900229a92c20d43",
+                "5097f113c30474fe"
+            ]
+        ]
+    },
+    {
+        "id": "921682481c7b605d",
+        "type": "http response",
+        "z": "3be9767593524592",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1630,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "3ed525681d2e8d93",
+        "type": "change",
+        "z": "3be9767593524592",
+        "name": "",
+        "rules": [
+            {
+                "t": "delete",
+                "p": "statusCode",
+                "pt": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1460,
+        "y": 860,
+        "wires": [
+            [
+                "921682481c7b605d"
+            ]
+        ]
+    },
+    {
+        "id": "b1523d44c28c5329",
+        "type": "OpcUa-Client",
+        "z": "3be9767593524592",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 700,
+        "y": 860,
+        "wires": [
+            [
+                "bb7790280e792fdc"
+            ]
+        ]
+    },
+    {
+        "id": "bb7790280e792fdc",
+        "type": "join",
+        "z": "3be9767593524592",
+        "name": "连接十条数据",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "10",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 1120,
+        "y": 860,
+        "wires": [
+            [
+                "d9f5b69c014a5872"
+            ]
+        ]
+    },
+    {
+        "id": "d9f5b69c014a5872",
+        "type": "function",
+        "z": "3be9767593524592",
+        "name": "数据赋值",
+        "func": "msg.statusCode = 200;\nvar step_daowei = msg.payload['ns=4;s=MAIN.step_daowei'];\nvar step_tichu = msg.payload['ns=4;s=MAIN.step_tichu'];\n\nmsg.payload = {};\nmsg.payload.step_daowei = step_daowei;\nmsg.payload.step_tichu = step_tichu;\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1280,
+        "y": 860,
+        "wires": [
+            [
+                "3ed525681d2e8d93"
+            ]
+        ]
+    },
+    {
+        "id": "a85c57ce421112de",
+        "type": "OpcUa-Item",
+        "z": "3be9767593524592",
+        "item": "ns=4;s=MAIN.ready",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取系统启停状态ready",
+        "x": 400,
+        "y": 760,
+        "wires": [
+            [
+                "b1523d44c28c5329"
+            ]
+        ]
+    },
+    {
+        "id": "86ed1b3025348fa3",
+        "type": "OpcUa-Item",
+        "z": "3be9767593524592",
+        "item": "ns=4;s=MAIN.tichu",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取剔除状态tichu",
+        "x": 380,
+        "y": 800,
+        "wires": [
+            [
+                "b1523d44c28c5329"
+            ]
+        ]
+    },
+    {
+        "id": "2839cdda54cdd71f",
+        "type": "OpcUa-Item",
+        "z": "3be9767593524592",
+        "item": "ns=4;s=MAIN.act_speed1_step",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取步进电机速度act_speed1_step",
+        "x": 440,
+        "y": 840,
+        "wires": [
+            [
+                "b1523d44c28c5329"
+            ]
+        ]
+    },
+    {
+        "id": "5a1f23fccd5ff964",
+        "type": "OpcUa-Item",
+        "z": "3be9767593524592",
+        "item": "ns=4;s=MAIN.act_speed2_amk",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取皮带电机速度act_speed2_amk",
+        "x": 440,
+        "y": 880,
+        "wires": [
+            [
+                "b1523d44c28c5329"
+            ]
+        ]
+    },
+    {
+        "id": "71892b2e4b7c51a6",
+        "type": "OpcUa-Item",
+        "z": "3be9767593524592",
+        "item": "ns=4;s=MAIN.tichuC",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取剔除总数tichuC",
+        "x": 390,
+        "y": 920,
+        "wires": [
+            [
+                "b1523d44c28c5329"
+            ]
+        ]
+    },
+    {
+        "id": "e900229a92c20d43",
+        "type": "OpcUa-Item",
+        "z": "3be9767593524592",
+        "item": "ns=4;s=MAIN.yunxingC",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取运行总数yunxingC",
+        "x": 400,
+        "y": 960,
+        "wires": [
+            [
+                "b1523d44c28c5329"
+            ]
+        ]
+    },
+    {
+        "id": "c16eba4085c5c509",
+        "type": "template",
+        "z": "3be9767593524592",
+        "name": "查询合格率",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "SELECT * FROM ct03.fpy order by ts desc limit 1;",
+        "output": "str",
+        "x": 570,
+        "y": 1040,
+        "wires": [
+            [
+                "5334d7a36ac8b92a"
+            ]
+        ]
+    },
+    {
+        "id": "5334d7a36ac8b92a",
+        "type": "subflow:1ee53fab9037a87f",
+        "z": "3be9767593524592",
+        "name": "",
+        "env": [
+            {
+                "name": "url",
+                "value": "192.168.11.201:6041",
+                "type": "str"
+            },
+            {
+                "name": "username",
+                "value": "root",
+                "type": "str"
+            },
+            {
+                "name": "password",
+                "value": "taosdata",
+                "type": "str"
+            }
+        ],
+        "x": 740,
+        "y": 1040,
+        "wires": [
+            [
+                "9f194a0f84203c46"
+            ]
+        ]
+    },
+    {
+        "id": "b411f5cc58f2f0fe",
+        "type": "template",
+        "z": "3be9767593524592",
+        "name": "查询步进电机累计运行时间",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "SELECT * FROM ct03.StepOn order by ts desc limit 1;",
+        "output": "str",
+        "x": 620,
+        "y": 1100,
+        "wires": [
+            [
+                "2fc78ae7f088d739"
+            ]
+        ]
+    },
+    {
+        "id": "2fc78ae7f088d739",
+        "type": "subflow:1ee53fab9037a87f",
+        "z": "3be9767593524592",
+        "name": "",
+        "env": [
+            {
+                "name": "url",
+                "value": "192.168.11.201:6041",
+                "type": "str"
+            },
+            {
+                "name": "username",
+                "value": "root",
+                "type": "str"
+            },
+            {
+                "name": "password",
+                "value": "taosdata",
+                "type": "str"
+            }
+        ],
+        "x": 840,
+        "y": 1100,
+        "wires": [
+            [
+                "25a6fd82e1d480b9"
+            ]
+        ]
+    },
+    {
+        "id": "2356eaba039e3e76",
+        "type": "template",
+        "z": "3be9767593524592",
+        "name": "查询皮带电机累计运行时间",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "SELECT * FROM ct03.AmkOn order by ts desc limit 1;",
+        "output": "str",
+        "x": 620,
+        "y": 1160,
+        "wires": [
+            [
+                "abc9d69f5b722f41"
+            ]
+        ]
+    },
+    {
+        "id": "abc9d69f5b722f41",
+        "type": "subflow:1ee53fab9037a87f",
+        "z": "3be9767593524592",
+        "name": "",
+        "env": [
+            {
+                "name": "url",
+                "value": "192.168.11.201:6041",
+                "type": "str"
+            },
+            {
+                "name": "username",
+                "value": "root",
+                "type": "str"
+            },
+            {
+                "name": "password",
+                "value": "taosdata",
+                "type": "str"
+            }
+        ],
+        "x": 840,
+        "y": 1160,
+        "wires": [
+            [
+                "d9c7cbb1bd4e3ab1"
+            ]
+        ]
+    },
+    {
+        "id": "31e1830cc7db50c6",
+        "type": "template",
+        "z": "3be9767593524592",
+        "name": "查询系统累计运行时间",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "SELECT * FROM ct03.SystemOn order by ts desc limit 1;",
+        "output": "str",
+        "x": 600,
+        "y": 1220,
+        "wires": [
+            [
+                "18857df55132dc05"
+            ]
+        ]
+    },
+    {
+        "id": "18857df55132dc05",
+        "type": "subflow:1ee53fab9037a87f",
+        "z": "3be9767593524592",
+        "name": "",
+        "env": [
+            {
+                "name": "url",
+                "value": "192.168.11.201:6041",
+                "type": "str"
+            },
+            {
+                "name": "username",
+                "value": "root",
+                "type": "str"
+            },
+            {
+                "name": "password",
+                "value": "taosdata",
+                "type": "str"
+            }
+        ],
+        "x": 840,
+        "y": 1220,
+        "wires": [
+            [
+                "a69da1cc1ee73e4b"
+            ]
+        ]
+    },
+    {
+        "id": "5097f113c30474fe",
+        "type": "change",
+        "z": "3be9767593524592",
+        "name": "预存数据",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "temp._msgid",
+                "pt": "msg",
+                "to": "_msgid",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "temp.res",
+                "pt": "msg",
+                "to": "res",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "temp.req",
+                "pt": "msg",
+                "to": "req",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 360,
+        "y": 1140,
+        "wires": [
+            [
+                "c16eba4085c5c509",
+                "b411f5cc58f2f0fe",
+                "2356eaba039e3e76",
+                "31e1830cc7db50c6"
+            ]
+        ]
+    },
+    {
+        "id": "9f194a0f84203c46",
+        "type": "change",
+        "z": "3be9767593524592",
+        "name": "取回数据",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.data",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "_msgid",
+                "pt": "msg",
+                "to": "temp._msgid",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "res",
+                "pt": "msg",
+                "to": "temp.res",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "req",
+                "pt": "msg",
+                "to": "temp.req",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 920,
+        "y": 1040,
+        "wires": [
+            [
+                "bb7790280e792fdc"
+            ]
+        ]
+    },
+    {
+        "id": "25a6fd82e1d480b9",
+        "type": "change",
+        "z": "3be9767593524592",
+        "name": "取回数据",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.data",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "_msgid",
+                "pt": "msg",
+                "to": "temp._msgid",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "res",
+                "pt": "msg",
+                "to": "temp.res",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "req",
+                "pt": "msg",
+                "to": "temp.req",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 980,
+        "y": 1100,
+        "wires": [
+            [
+                "bb7790280e792fdc"
+            ]
+        ]
+    },
+    {
+        "id": "d9c7cbb1bd4e3ab1",
+        "type": "change",
+        "z": "3be9767593524592",
+        "name": "取回数据",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.data",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "_msgid",
+                "pt": "msg",
+                "to": "temp._msgid",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "res",
+                "pt": "msg",
+                "to": "temp.res",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "req",
+                "pt": "msg",
+                "to": "temp.req",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 980,
+        "y": 1160,
+        "wires": [
+            [
+                "bb7790280e792fdc"
+            ]
+        ]
+    },
+    {
+        "id": "a69da1cc1ee73e4b",
+        "type": "change",
+        "z": "3be9767593524592",
+        "name": "取回数据",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.data",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "_msgid",
+                "pt": "msg",
+                "to": "temp._msgid",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "res",
+                "pt": "msg",
+                "to": "temp.res",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "req",
+                "pt": "msg",
+                "to": "temp.req",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 980,
+        "y": 1220,
+        "wires": [
+            [
+                "bb7790280e792fdc"
+            ]
+        ]
+    },
+    {
+        "id": "d434c7d20c7328c1",
+        "type": "http in",
+        "z": "3be9767593524592",
+        "name": "",
+        "url": "/StepOn",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 480,
+        "wires": [
+            [
+                "c656cbf231b78f37"
+            ]
+        ]
+    },
+    {
+        "id": "c656cbf231b78f37",
+        "type": "change",
+        "z": "3be9767593524592",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "StepOn",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 330,
+        "y": 480,
+        "wires": [
+            [
+                "98a761a7e5240423"
+            ]
+        ]
+    },
+    {
+        "id": "98a761a7e5240423",
+        "type": "http response",
+        "z": "3be9767593524592",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 510,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "5e031094ab296344",
+        "type": "http in",
+        "z": "3be9767593524592",
+        "name": "",
+        "url": "/AmkOn",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 540,
+        "wires": [
+            [
+                "7172225f14f22517"
+            ]
+        ]
+    },
+    {
+        "id": "7172225f14f22517",
+        "type": "change",
+        "z": "3be9767593524592",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "AmkOn",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 330,
+        "y": 540,
+        "wires": [
+            [
+                "45d91fd7320280d3"
+            ]
+        ]
+    },
+    {
+        "id": "45d91fd7320280d3",
+        "type": "http response",
+        "z": "3be9767593524592",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 510,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "f86b1191c8b92765",
+        "type": "http in",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "url": "/control/ready",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 150,
+        "y": 60,
+        "wires": [
+            [
+                "e789b28f87f56ae8"
+            ]
+        ]
+    },
+    {
+        "id": "ea64ba34da5c28fd",
+        "type": "http response",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1290,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "76f7c6b4fdd88eea",
+        "type": "OpcUa-Item",
+        "z": "78e9b6ba2fdbe76d",
+        "item": "ns=4;s=MAIN.ready",
+        "datatype": "Int32",
+        "value": "",
+        "name": "写系统启停状态ready",
+        "x": 540,
+        "y": 60,
+        "wires": [
+            [
+                "e669576793c028eb"
+            ]
+        ]
+    },
+    {
+        "id": "e669576793c028eb",
+        "type": "OpcUa-Client",
+        "z": "78e9b6ba2fdbe76d",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "write",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 740,
+        "y": 60,
+        "wires": [
+            [
+                "917d064c9ee52f20"
+            ]
+        ]
+    },
+    {
+        "id": "697e221662f8d314",
+        "type": "change",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "写入成功",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "写入成功",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1020,
+        "y": 40,
+        "wires": [
+            [
+                "9f9eb0c6281cfcaa"
+            ]
+        ]
+    },
+    {
+        "id": "e789b28f87f56ae8",
+        "type": "function",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "转换输入类型",
+        "func": "msg.payload = Number(msg.payload.value);\nif (isNaN(msg.payload)) {\n    msg.payload = \"\";\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 60,
+        "wires": [
+            [
+                "76f7c6b4fdd88eea"
+            ]
+        ]
+    },
+    {
+        "id": "917d064c9ee52f20",
+        "type": "switch",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 890,
+        "y": 60,
+        "wires": [
+            [
+                "697e221662f8d314"
+            ],
+            [
+                "811dfeef2a0a6b30"
+            ]
+        ]
+    },
+    {
+        "id": "811dfeef2a0a6b30",
+        "type": "change",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "写入成功",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "写入失败",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1020,
+        "y": 80,
+        "wires": [
+            [
+                "25084574c41138f8"
+            ]
+        ]
+    },
+    {
+        "id": "9f9eb0c6281cfcaa",
+        "type": "function",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "格式封装",
+        "func": "msg.payload = { \"code\": 1, \"message\": 'GET success', \"time\": msg.timestamp };\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1160,
+        "y": 40,
+        "wires": [
+            [
+                "ea64ba34da5c28fd"
+            ]
+        ]
+    },
+    {
+        "id": "25084574c41138f8",
+        "type": "function",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "格式封装",
+        "func": "msg.payload = { \"code\": 0, \"message\": 'GET failed', \"time\": msg.timestamp };\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1160,
+        "y": 80,
+        "wires": [
+            [
+                "ea64ba34da5c28fd"
+            ]
+        ]
+    },
+    {
+        "id": "800a3c01d06c2765",
+        "type": "http in",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "url": "/control/act_speed1_step",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 180,
+        "y": 180,
+        "wires": [
+            [
+                "bb3bd68306ade934"
+            ]
+        ]
+    },
+    {
+        "id": "d06a81783e389de4",
+        "type": "http response",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1430,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "6d6ab61f23924b0e",
+        "type": "OpcUa-Item",
+        "z": "78e9b6ba2fdbe76d",
+        "item": "ns=4;s=MAIN.act_speed1_step",
+        "datatype": "Int32",
+        "value": "",
+        "name": "写步进电机速度act_speed1_step",
+        "x": 640,
+        "y": 180,
+        "wires": [
+            [
+                "7e2c307a3141ba3c"
+            ]
+        ]
+    },
+    {
+        "id": "7e2c307a3141ba3c",
+        "type": "OpcUa-Client",
+        "z": "78e9b6ba2fdbe76d",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "write",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 880,
+        "y": 180,
+        "wires": [
+            [
+                "3a972a126921005f"
+            ]
+        ]
+    },
+    {
+        "id": "ad1bce88eeb59d09",
+        "type": "change",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "写入成功",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "写入成功",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1160,
+        "y": 160,
+        "wires": [
+            [
+                "f5fc8b08cae66b75"
+            ]
+        ]
+    },
+    {
+        "id": "bb3bd68306ade934",
+        "type": "function",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "转换输入类型",
+        "func": "msg.payload = Number(msg.payload.value);\nif (isNaN(msg.payload)) {\n    msg.payload = \"\";\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 180,
+        "wires": [
+            [
+                "6d6ab61f23924b0e"
+            ]
+        ]
+    },
+    {
+        "id": "3a972a126921005f",
+        "type": "switch",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1030,
+        "y": 180,
+        "wires": [
+            [
+                "ad1bce88eeb59d09"
+            ],
+            [
+                "ca2adfea8eb9171d"
+            ]
+        ]
+    },
+    {
+        "id": "ca2adfea8eb9171d",
+        "type": "change",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "写入成功",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "写入失败",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1160,
+        "y": 200,
+        "wires": [
+            [
+                "f9a298ee5f0b627e"
+            ]
+        ]
+    },
+    {
+        "id": "f5fc8b08cae66b75",
+        "type": "function",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "格式封装",
+        "func": "msg.payload = { \"code\": 1, \"message\": 'GET success', \"time\": msg.timestamp };\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1300,
+        "y": 160,
+        "wires": [
+            [
+                "d06a81783e389de4"
+            ]
+        ]
+    },
+    {
+        "id": "f9a298ee5f0b627e",
+        "type": "function",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "格式封装",
+        "func": "msg.payload = { \"code\": 0, \"message\": 'GET failed', \"time\": msg.timestamp };\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1300,
+        "y": 200,
+        "wires": [
+            [
+                "d06a81783e389de4"
+            ]
+        ]
+    },
+    {
+        "id": "1288576c1adb400b",
+        "type": "http in",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "url": "/control/act_speed2_amk",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 180,
+        "y": 280,
+        "wires": [
+            [
+                "328a93439e289b4a"
+            ]
+        ]
+    },
+    {
+        "id": "d7934d8b13f8c2f1",
+        "type": "http response",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1430,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "c0ee3f69628a85d7",
+        "type": "OpcUa-Item",
+        "z": "78e9b6ba2fdbe76d",
+        "item": "ns=4;s=MAIN.act_speed2_amk",
+        "datatype": "Int32",
+        "value": "",
+        "name": "写步进电机速度act_speed2_amk",
+        "x": 640,
+        "y": 280,
+        "wires": [
+            [
+                "58003e825337ec57"
+            ]
+        ]
+    },
+    {
+        "id": "58003e825337ec57",
+        "type": "OpcUa-Client",
+        "z": "78e9b6ba2fdbe76d",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "write",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 880,
+        "y": 280,
+        "wires": [
+            [
+                "ed0f68185bf00e00"
+            ]
+        ]
+    },
+    {
+        "id": "c6d77ad82cfe955e",
+        "type": "change",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "写入成功",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "写入成功",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1160,
+        "y": 260,
+        "wires": [
+            [
+                "2d6a4e836da745cc"
+            ]
+        ]
+    },
+    {
+        "id": "328a93439e289b4a",
+        "type": "function",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "转换输入类型",
+        "func": "msg.payload = Number(msg.payload.value);\nif (isNaN(msg.payload)) {\n    msg.payload = \"\";\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 280,
+        "wires": [
+            [
+                "c0ee3f69628a85d7"
+            ]
+        ]
+    },
+    {
+        "id": "ed0f68185bf00e00",
+        "type": "switch",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1030,
+        "y": 280,
+        "wires": [
+            [
+                "c6d77ad82cfe955e"
+            ],
+            [
+                "c288fdb5f39be9ee"
+            ]
+        ]
+    },
+    {
+        "id": "c288fdb5f39be9ee",
+        "type": "change",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "写入成功",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "写入失败",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1160,
+        "y": 300,
+        "wires": [
+            [
+                "3b1742cebddee5c8"
+            ]
+        ]
+    },
+    {
+        "id": "2d6a4e836da745cc",
+        "type": "function",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "格式封装",
+        "func": "msg.payload = { \"code\": 1, \"message\": 'GET success', \"time\": msg.timestamp };\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1300,
+        "y": 260,
+        "wires": [
+            [
+                "d7934d8b13f8c2f1"
+            ]
+        ]
+    },
+    {
+        "id": "3b1742cebddee5c8",
+        "type": "function",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "格式封装",
+        "func": "msg.payload = { \"code\": 0, \"message\": 'GET failed', \"time\": msg.timestamp };\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1300,
+        "y": 300,
+        "wires": [
+            [
+                "d7934d8b13f8c2f1"
+            ]
+        ]
+    },
+    {
+        "id": "13d5f2aa4386751f",
+        "type": "http in",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "url": "/control/tichu",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 150,
+        "y": 380,
+        "wires": [
+            [
+                "b8edb7f080a3b6fc"
+            ]
+        ]
+    },
+    {
+        "id": "d93703bbb88e4ba4",
+        "type": "http response",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1290,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "20ab495eff72c867",
+        "type": "OpcUa-Item",
+        "z": "78e9b6ba2fdbe76d",
+        "item": "ns=4;s=MAIN.tichu",
+        "datatype": "Int32",
+        "value": "",
+        "name": "写系统启停状态tichu",
+        "x": 540,
+        "y": 380,
+        "wires": [
+            [
+                "708043b6bdb51d83"
+            ]
+        ]
+    },
+    {
+        "id": "708043b6bdb51d83",
+        "type": "OpcUa-Client",
+        "z": "78e9b6ba2fdbe76d",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "write",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 740,
+        "y": 380,
+        "wires": [
+            [
+                "f8c91128f8b937aa"
+            ]
+        ]
+    },
+    {
+        "id": "55b392873bc23bc1",
+        "type": "change",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "写入成功",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "写入成功",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1020,
+        "y": 360,
+        "wires": [
+            [
+                "960579608d7a9f01"
+            ]
+        ]
+    },
+    {
+        "id": "b8edb7f080a3b6fc",
+        "type": "function",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "转换输入类型",
+        "func": "msg.payload = Number(msg.payload.value);\nif (isNaN(msg.payload)) {\n    msg.payload = \"\";\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 380,
+        "wires": [
+            [
+                "20ab495eff72c867"
+            ]
+        ]
+    },
+    {
+        "id": "f8c91128f8b937aa",
+        "type": "switch",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 890,
+        "y": 380,
+        "wires": [
+            [
+                "55b392873bc23bc1"
+            ],
+            [
+                "4754e75965ec95b0"
+            ]
+        ]
+    },
+    {
+        "id": "4754e75965ec95b0",
+        "type": "change",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "写入成功",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "写入失败",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1020,
+        "y": 400,
+        "wires": [
+            [
+                "95249dd03095262a"
+            ]
+        ]
+    },
+    {
+        "id": "960579608d7a9f01",
+        "type": "function",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "格式封装",
+        "func": "msg.payload = { \"code\": 1, \"message\": 'GET success', \"time\": msg.timestamp };\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1160,
+        "y": 360,
+        "wires": [
+            [
+                "d93703bbb88e4ba4"
+            ]
+        ]
+    },
+    {
+        "id": "95249dd03095262a",
+        "type": "function",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "格式封装",
+        "func": "msg.payload = { \"code\": 0, \"message\": 'GET failed', \"time\": msg.timestamp };\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1160,
+        "y": 400,
+        "wires": [
+            [
+                "d93703bbb88e4ba4"
+            ]
+        ]
+    },
+    {
+        "id": "b22a6849a8fab738",
+        "type": "http in",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "url": "/Reset/SetpOn",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 150,
+        "y": 520,
+        "wires": [
+            [
+                "ecb2bd16ecddff59"
+            ]
+        ]
+    },
+    {
+        "id": "4c209ff27dbbec89",
+        "type": "http response",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1370,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "ecb2bd16ecddff59",
+        "type": "change",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "加入时间戳",
+        "rules": [
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 350,
+        "y": 520,
+        "wires": [
+            [
+                "062f7bf5a2cdc8e7"
+            ]
+        ]
+    },
+    {
+        "id": "062f7bf5a2cdc8e7",
+        "type": "change",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "StepOn",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 570,
+        "y": 520,
+        "wires": [
+            [
+                "059177e453e2f46e"
+            ]
+        ]
+    },
+    {
+        "id": "ee096c137d48d171",
+        "type": "template",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "写入SystemOn表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "INSERT INTO ct03.SystemOn using ct03.float_data tags('SystemOn') values({{timestamp}},{{payload}});",
+        "output": "str",
+        "x": 1030,
+        "y": 520,
+        "wires": [
+            [
+                "aefa154dff5559fd"
+            ]
+        ]
+    },
+    {
+        "id": "aefa154dff5559fd",
+        "type": "subflow:1ee53fab9037a87f",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "env": [
+            {
+                "name": "url",
+                "value": "192.168.11.201:6041",
+                "type": "str"
+            },
+            {
+                "name": "username",
+                "value": "root",
+                "type": "str"
+            },
+            {
+                "name": "password",
+                "value": "taosdata",
+                "type": "str"
+            }
+        ],
+        "x": 1220,
+        "y": 520,
+        "wires": [
+            [
+                "4c209ff27dbbec89"
+            ]
+        ]
+    },
+    {
+        "id": "3bbb22faa3fb2505",
+        "type": "http in",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "url": "/Reset/AmkOn",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 150,
+        "y": 600,
+        "wires": [
+            [
+                "7b3892bc18ca5d9f"
+            ]
+        ]
+    },
+    {
+        "id": "0adf56cd97cfaed4",
+        "type": "http response",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1370,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "7b3892bc18ca5d9f",
+        "type": "change",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "加入时间戳",
+        "rules": [
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 350,
+        "y": 600,
+        "wires": [
+            [
+                "69f323fa8a692dad"
+            ]
+        ]
+    },
+    {
+        "id": "69f323fa8a692dad",
+        "type": "change",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "AmkOn",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 570,
+        "y": 600,
+        "wires": [
+            [
+                "1120c12049f6ee40"
+            ]
+        ]
+    },
+    {
+        "id": "f340771ee6372381",
+        "type": "template",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "写入SystemOn表",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "sql",
+        "syntax": "mustache",
+        "template": "INSERT INTO ct03.SystemOn using ct03.float_data tags('SystemOn') values({{timestamp}},{{payload}});",
+        "output": "str",
+        "x": 1030,
+        "y": 600,
+        "wires": [
+            [
+                "0fa43c56b366c94b"
+            ]
+        ]
+    },
+    {
+        "id": "0fa43c56b366c94b",
+        "type": "subflow:1ee53fab9037a87f",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "env": [
+            {
+                "name": "url",
+                "value": "192.168.11.201:6041",
+                "type": "str"
+            },
+            {
+                "name": "username",
+                "value": "root",
+                "type": "str"
+            },
+            {
+                "name": "password",
+                "value": "taosdata",
+                "type": "str"
+            }
+        ],
+        "x": 1220,
+        "y": 600,
+        "wires": [
+            [
+                "0adf56cd97cfaed4"
+            ]
+        ]
+    },
+    {
+        "id": "059177e453e2f46e",
+        "type": "change",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "StepOn",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 810,
+        "y": 520,
+        "wires": [
+            [
+                "ee096c137d48d171"
+            ]
+        ]
+    },
+    {
+        "id": "1120c12049f6ee40",
+        "type": "change",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "AmkOn",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 790,
+        "y": 600,
+        "wires": [
+            [
+                "f340771ee6372381"
+            ]
+        ]
+    },
+    {
+        "id": "73d0c73ab8544bb7",
+        "type": "http in",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "url": "/Efficiency",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 140,
+        "y": 740,
+        "wires": [
+            [
+                "b6ca6fe121264c47"
+            ]
+        ]
+    },
+    {
+        "id": "e117114e3320c37a",
+        "type": "http response",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1570,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "b6ca6fe121264c47",
+        "type": "OpcUa-Item",
+        "z": "78e9b6ba2fdbe76d",
+        "item": "ns=4;s=MAIN.tichuC",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取剔除总数tichuC",
+        "x": 390,
+        "y": 720,
+        "wires": [
+            [
+                "3c0f5ca8060fc689"
+            ]
+        ]
+    },
+    {
+        "id": "3c0f5ca8060fc689",
+        "type": "OpcUa-Client",
+        "z": "78e9b6ba2fdbe76d",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 580,
+        "y": 720,
+        "wires": [
+            [
+                "894d75fe15e67005"
+            ]
+        ]
+    },
+    {
+        "id": "894d75fe15e67005",
+        "type": "change",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "tichuC",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 760,
+        "y": 720,
+        "wires": [
+            [
+                "321233c05006510d"
+            ]
+        ]
+    },
+    {
+        "id": "321233c05006510d",
+        "type": "OpcUa-Item",
+        "z": "78e9b6ba2fdbe76d",
+        "item": "ns=4;s=MAIN.yunxingC",
+        "datatype": "Int32",
+        "value": "",
+        "name": "取运行总数yunxingC",
+        "x": 380,
+        "y": 760,
+        "wires": [
+            [
+                "186be96b22d0e73b"
+            ]
+        ]
+    },
+    {
+        "id": "186be96b22d0e73b",
+        "type": "OpcUa-Client",
+        "z": "78e9b6ba2fdbe76d",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 580,
+        "y": 760,
+        "wires": [
+            [
+                "d868f4884d277acf"
+            ]
+        ]
+    },
+    {
+        "id": "d868f4884d277acf",
+        "type": "change",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "yunxingC",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 770,
+        "y": 760,
+        "wires": [
+            [
+                "e4cef119fb190ef9"
+            ]
+        ]
+    },
+    {
+        "id": "e4cef119fb190ef9",
+        "type": "function",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "计算有效值QP",
+        "func": "msg.QP = msg.yunxingC - msg.tichu;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 980,
+        "y": 740,
+        "wires": [
+            [
+                "62ef78aa2ba32c22"
+            ]
+        ]
+    },
+    {
+        "id": "62ef78aa2ba32c22",
+        "type": "function",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "计算运行效率",
+        "func": "global.Efficiency = (msg.QP)/(100 * global.SystemOn);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1180,
+        "y": 740,
+        "wires": [
+            [
+                "93d01568213ab0af"
+            ]
+        ]
+    },
+    {
+        "id": "93d01568213ab0af",
+        "type": "change",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "Efficiency",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1390,
+        "y": 740,
+        "wires": [
+            [
+                "e117114e3320c37a"
+            ]
+        ]
+    },
+    {
+        "id": "de8059e2e57aaf01",
+        "type": "inject",
+        "z": "78e9b6ba2fdbe76d",
+        "d": true,
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 860,
+        "wires": [
+            [
+                "62e3e99fcff75680"
+            ]
+        ]
+    },
+    {
+        "id": "7705e1a3ba63a63f",
+        "type": "OpcUa-Item",
+        "z": "78e9b6ba2fdbe76d",
+        "item": "ns=4;s=MAIN.Voltage",
+        "datatype": "Int32",
+        "value": "",
+        "name": "写入电压表接口Voltage",
+        "x": 590,
+        "y": 860,
+        "wires": [
+            [
+                "e05f1cb0151cab58"
+            ]
+        ]
+    },
+    {
+        "id": "e05f1cb0151cab58",
+        "type": "OpcUa-Client",
+        "z": "78e9b6ba2fdbe76d",
+        "endpoint": "ba572fbd6d0dd168",
+        "action": "write",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 800,
+        "y": 860,
+        "wires": [
+            [
+                "8c4eb6e4d0efe5f2"
+            ]
+        ]
+    },
+    {
+        "id": "62e3e99fcff75680",
+        "type": "change",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "Efficiency",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 350,
+        "y": 860,
+        "wires": [
+            [
+                "7705e1a3ba63a63f"
+            ]
+        ]
+    },
+    {
+        "id": "8c4eb6e4d0efe5f2",
+        "type": "debug",
+        "z": "78e9b6ba2fdbe76d",
+        "name": "写入电压表",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 990,
+        "y": 860,
+        "wires": []
+    }
+]
